@@ -2,7 +2,12 @@ from django.shortcuts import render
 from .forms import ApplicationForm
 from .models import Form
 from django.contrib import messages
-
+from django.core.mail import EmailMessage
+from dotenv import load_dotenv
+import os
+load_dotenv()
+email_user = os.getenv("MAIL_USERNAME")
+email_password = os.getenv("MAIL_PASSWORD")
 
 def index(request):
     if request.method == "POST":
@@ -22,5 +27,10 @@ def index(request):
                 date=date,
                 occupation=occupation
             )
+
+            message_body = f"A new job application was submitted. Thank you {first_name} {last_name}"
+            email_message = EmailMessage("Form submission confirmation", message_body, to=[email])
+            email_message.send()
+
             messages.success(request, "Form submitted successfully")
     return render(request, "index.html")
